@@ -63,9 +63,9 @@ def onboarding_v2():
     print(f'/cuenta clabe {loan_clabe}')
     print(f'/id del cliente {id_client}')
     #Creation to loan account
-    #loan_clabe = "646180288000003941"
-    #encodedKey_client="8a44bcb67f994866017f9d8cd83070ad"
-    #id_client="394214915508441"
+    loan_clabe = "646180288000003996"
+    encodedKey_client="8a44b4727f9deba5017f9ec89f1b4719"
+    id_client="771473739096324"
     ##Producto v6.6
     encodedKey_loan = "8a44d30d7efd20c8017efd22a4eb0003"
     payload = create_account_pts(encodedKey_client,encodedKey_loan,params["monto"], params["plazo"],  params["dia"], params["interes"],  params["desembolso"], params["primer_pago"])
@@ -153,6 +153,8 @@ def usuario():
     user["lastName"]=process["lastName"]
     user["emailAddress"]=process["emailAddress"]
     user["mobilePhone"]=process["mobilePhone"]
+    user["clabe"]=process["_Información_Bancaria_Clientes"]["Clabe"]
+    user["materno"]=process["_Datos_Personales_Adicional_Clie"]["Apellido_Materno"]
     #Obtiene todas las cuentas de prestamo asociadas al encodedkey del cliente
     print(f'encodedkey_client = {encodedkey_client}')
     payload = search_loans(encodedkey_client)
