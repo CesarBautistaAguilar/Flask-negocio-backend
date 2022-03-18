@@ -63,12 +63,13 @@ def onboarding_v2():
     print(f'/cuenta clabe {loan_clabe}')
     print(f'/id del cliente {id_client}')
     #Creation to loan account
-    #loan_clabe = "646180288000003459"
-    #encodedKey_client="8a44dd067f8ed93c017f8f5f14c00ab3"
-    #id_client="1234"
+    #loan_clabe = "646180288000003941"
+    #encodedKey_client="8a44bcb67f994866017f9d8cd83070ad"
+    #id_client="394214915508441"
     ##Producto v6.6
     encodedKey_loan = "8a44d30d7efd20c8017efd22a4eb0003"
     payload = create_account_pts(encodedKey_client,encodedKey_loan,params["monto"], params["plazo"],  params["dia"], params["interes"],  params["desembolso"], params["primer_pago"])
+    print(payload)
     r = requests.post(f'{url_base}/mangosta/loans/0/create', headers=headers, verify=False, data=json.dumps(payload) )
     print(f'/mangosta/loans/0/create status {r.status_code}')
     print(f'/mangosta/loans/0/create response {r.text}')
@@ -83,7 +84,6 @@ def onboarding_v2():
     #Get schema of payments
     r = requests.get(f'{url_base}/mangosta/loans/{id_account}/schedule', headers=headers,  verify=False)
     print(f'/mangosta/loans/{id_account}/schedule status {r.status_code}')
-    print(f'/mangosta/loans/{id_account}/schedule response {r.text}')
     schema_loan = json.loads(r.text)["messageRS"]["response"]
     schema_loan["id"] = id_account
     schema_loan["idClient"] = id_client
@@ -104,6 +104,7 @@ def aprobacion():
     numer_clabe = params["clabe"]
     day_dis = params["fecha"]
     payload = aproved_account_pts(numer_clabe, day_dis)
+    print(payload)
     r = requests.post(f'{url_base}/mangosta/loans/{id_account}/approve', headers=headers, verify=False, data=json.dumps(payload) )
     print(f'/mangosta/loans/{id_account}/approve status {r.status_code}')
     print(f'/mangosta/loans/{id_account}/approve response {r.text}')
@@ -171,6 +172,7 @@ def usuario():
 def pagos():
     params = dict(request.args)
     payload = create_pago_pts(params["clientFullName"], params["monto"], params["fechaoperacion"], params["clientCLABE"], params["referencianumerica"])
+    print(payload)
     r = requests.post(f'{url_base}/mangosta/loans/repayment/0/receive', headers=headers, verify=False, data=json.dumps(payload) )
     print(f'/mangosta/loans/repayment/0/receive {r.status_code}')
     print(f'/mangosta/loans/repayment/0/receive response {r.text}')
@@ -178,17 +180,21 @@ def pagos():
     result.headers['Access-Control-Allow-Origin'] = '*'
     return result
 
+#Saldos
+@app.route('/saldos', methods=['GET'])
+def saldos():
+    params = dict(request.args)
+    id_account = params["idprestamo"]
+    #Busca cliente por ID
+    r = requests.get(f'{url_base}/mangosta/loans/{id_account}/schedule', headers=headers,  verify=False)
+    print(f'/mangosta/loans/{id_account}/schedule status {r.status_code}')
+    print(f'/mangosta/loans/{id_account}/schedule response {r.text}')
+    schema_loan = json.loads(r.text)["messageRS"]["response"]
+    result =  Response(json.dumps(schema_loan,default=str),mimetype="application/json")
+    result.headers['Access-Control-Allow-Origin'] = '*'
+    return result
+
 #Abortar una peticion
 @app.route('/abort')
 def abortar():
     abort(401)
-
-"""
-@app.route('/desembolso', methods=['GET'])
-def desembolso():
-    #Desembolsar prestamo
-    print(response_desmbolso)
-    result =  Response(json.dumps(response_desmbolso,default=str),mimetype="application/json")
-    result.headers['Access-Control-Allow-Origin'] = '*'
-    return result
-"""
