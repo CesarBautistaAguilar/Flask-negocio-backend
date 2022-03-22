@@ -36,6 +36,10 @@ def go():
     r = requests.post(f'{url_base}/mangosta/loans/0/preview-schedule', headers=headers, verify=False, data=json.dumps(payload) )
     print(f'/mangosta/loans/0/preview-schedule status {r.status_code}')
     print(f'/mangosta/loans/0/preview-schedule response {r.text}')
+    if(r.status_code != 200):
+        result =  Response(json.dumps({"message":"Error al crear el cliente"},default=str),mimetype="application/json", status=500)
+        result.headers['Access-Control-Allow-Origin'] = '*'
+        return result
     process = json.loads(r.text)
     schema_loan = process["messageRS"]["response"]
     result = Response(json.dumps(schema_loan,default=str),mimetype="application/json")
@@ -46,16 +50,24 @@ def go():
 @app.route('/onboarding_v2', methods=['GET'])
 def onboarding_v2():
     params = dict(request.args)
+    message_error_pts = ''
     #Creation to client
-    payload = create_client_pts(params["nombre"], params["a_p"], params["a_m"], params["telefono"], params["correo"], params["rfc"], params["curp"],params["banco"], params["clabe"], params["segundo_nombre"])
+    payload = create_client_pts(params["nombre"], params["a_p"], params["a_m"], params["telefono"], params["correo"], params["rfc"], params["curp"],params["banco"], params["clabe"], params["idcliente"],params["segundo_nombre"])
     print(str(payload))
     r = requests.post(f'{url_base}/mangosta/client/0/create', headers=headers, verify=False, data=json.dumps(payload) )
     print(f'/mangosta/client/0/create status {r.status_code}')
     print(f'/mangosta/client/0/create response {r.text}')
     if(r.status_code != 200):
-        result =  Response(json.dumps({"message":"Error al crear el cliente"},default=str),mimetype="application/json", status=500)
-        result.headers['Access-Control-Allow-Origin'] = '*'
-        return result
+        print("################### INTENTO CONSULTA ###################")
+        message_error_pts = str(r.json()["statusRS"]["description"]).split(':')
+        print(message_error_pts)
+        print(message_error_pts[0])
+        print("################### INTENTO CONSULTA ###################")
+        if(message_error_pts[0] != 'El Cliente ya existe con el ID'):
+            print("################### ENTRE A LA EXCEPCION ###################")
+            result =  Response(json.dumps({"message":"Error al crear el cliente"},default=str),mimetype="application/json", status=500)
+            result.headers['Access-Control-Allow-Origin'] = '*'
+            return result
     loan_clabe = r.json()["messageRS"]["response"]["_Información_Bancaria_Clientes"]["Clabe"]
     encodedKey_client = r.json()["messageRS"]["response"]["encodedKey"]
     id_client = r.json()["messageRS"]["response"]["id"]
@@ -63,9 +75,9 @@ def onboarding_v2():
     print(f'/cuenta clabe {loan_clabe}')
     print(f'/id del cliente {id_client}')
     #Creation to loan account
-    loan_clabe = "646180288000003996"
-    encodedKey_client="8a44b4727f9deba5017f9ec89f1b4719"
-    id_client="771473739096324"
+    #loan_clabe = "646180288000003996"
+    #encodedKey_client="8a44b4727f9deba5017f9ec89f1b4719"
+    #id_client="771473739096324"
     ##Producto v6.6
     encodedKey_loan = "8a44d30d7efd20c8017efd22a4eb0003"
     payload = create_account_pts(encodedKey_client,encodedKey_loan,params["monto"], params["plazo"],  params["dia"], params["interes"],  params["desembolso"], params["primer_pago"])
@@ -121,6 +133,7 @@ def desembolso():
     id_client = params["idcliente"]
     #Desembolsar prestamo
     payload = disbur_account_stp_pts(id_client,id_account, amount)
+    print(payload)
     r = requests.post(f'{url_base}/mangosta/loans/0/disbursement', headers=headers, verify=False, data=json.dumps(payload) )
     print(f'/mangosta/loans/0/disbursement status {r.status_code}')
     print(f'mangosta/loans/0/disbursement response {r.text}')

@@ -51,7 +51,7 @@ def create_simulation_pts(monto, plazo, dia):
     }
     return ofert_body
 
-def create_client_pts(nombre, a_p, a_m, telefono, correo, rfc, curp,banco, clabe, segundo_nombre=""):
+def create_client_pts(nombre, a_p, a_m, telefono, correo, rfc, curp,banco, clabe, idcliente ,segundo_nombre=""):
     client_body = {
     "headerRQ": {
         "msgId": "eecb8402-9111-499c-8396-e9efef573bc0",
@@ -64,13 +64,14 @@ def create_client_pts(nombre, a_p, a_m, telefono, correo, rfc, curp,banco, clabe
         "userId": ""
     },
     "messageRQ": {
-            "id":  generate_id(),
+            "id":  idcliente,
             "firstName": nombre,
             "middleName": segundo_nombre,
             "lastName": a_p,
             "mobilePhone": telefono,
             "emailAddress": correo,
             "assignedBranchKey": "8a44b1847f4efa4a017f4fc87a6d02f3",
+            "preferredLanguage": "SPANISH",
             "idDocuments": [
                 {
                     "documentType": "RFC",
