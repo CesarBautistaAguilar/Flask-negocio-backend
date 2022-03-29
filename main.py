@@ -68,7 +68,7 @@ def onboarding_v2():
             result =  Response(json.dumps({"message":"Error al crear el cliente"},default=str),mimetype="application/json", status=500)
             result.headers['Access-Control-Allow-Origin'] = '*'
             return result
-    loan_clabe = r.json()["messageRS"]["response"]["_Información_Bancaria_Clientes"]["Clabe"]
+    loan_clabe = r.json()["messageRS"]["repaymentClabe"]
     encodedKey_client = r.json()["messageRS"]["response"]["encodedKey"]
     id_client = r.json()["messageRS"]["response"]["id"]
     print(f'/encodedKey cliente {encodedKey_client}')
@@ -174,9 +174,15 @@ def usuario():
     r = requests.post(f'https://m775p.sandbox.mambu.com/api/loans:search?detailsLevel=BASIC', headers=headerss, verify=False, data=json.dumps(payload) )
     print(f'{encodedkey_client}/loans:search?detailsLevel=BASIC status {r.status_code}')
     loans=json.loads(r.text)
+    search_due = loans
+    index_due = 0
+    for i in search_due:
+        due_mount = due_loan(i["id"])
+        search_due[index_due]["due_mount"] = due_mount
+        index_due += 1
     response = {
         'user': user,
-        'loans': loans
+        'loans': search_due
     }
     result =  Response(json.dumps(response,default=str),mimetype="application/json")
     result.headers['Access-Control-Allow-Origin'] = '*'
@@ -213,3 +219,16 @@ def saldos():
 @app.route('/abort')
 def abortar():
     abort(401)
+
+def due_loan(id_account):
+    deuda = 0
+    r = requests.get(f'https://m775p.sandbox.mambu.com/api/loans/{id_account}/schedule', headers=headerss, verify=False )
+    schema_loan = dict(json.loads(r.text))
+    for i in schema_loan["installments"]:
+        if( i["state"] == 'LATE'):
+            deuda += float(i["principal"]["amount"]["due"])
+            deuda += float(i["interest"]["amount"]["due"])
+            deuda += float(i["fee"]["amount"]["due"])
+            deuda += float(i["penalty"]["amount"]["due"])
+    print(f'{id_account} => {deuda}')
+    return deuda

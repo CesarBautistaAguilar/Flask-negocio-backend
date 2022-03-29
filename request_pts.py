@@ -88,7 +88,8 @@ def create_client_pts(nombre, a_p, a_m, telefono, correo, rfc, curp,banco, clabe
             "_Información_Bancaria_Clientes": {
                 "Tipo_Cuenta": "test",
                 "Banco": banco,
-                "Tipo_Operacion": "depositos"
+                "Tipo_Operacion": "depositos",
+                "Clabe": clabe
             }
         }
     }
