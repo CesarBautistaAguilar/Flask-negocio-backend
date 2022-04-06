@@ -1,6 +1,6 @@
-# Api Rest Flask
+# Backend Demo Negocio
 
-_Ejemplo sencillo de una api rest usando flask_
+_Servicio Rest usando flask_
 
 ## Comenzando 🚀
 
@@ -13,7 +13,7 @@ Mira **Deployment** para conocer como desplegar el proyecto.
 
 _-Tener instalado Python 3.9.0._
 
-_-Crear un entorno virtual usando el comando(Windows):_
+_-Crear un entorno virtual usando el comando (Windows):_
 ```
 py -3 -m venv example
 ```
@@ -23,15 +23,21 @@ _-Activar el entonor virtual:_
 . example/Scripts/activate
 ```
 
+_-Desactivar el entonor virtual:_
+```
+deactivate
+```
+
 ### Instalación 🔧
 
-_Instalar la libreria Flask usando el gestor de paquetes pip._
+_Instalar la libreria Flask y Request usando el gestor de paquetes pip._
 
 ```
 pip install Flask
+pip install requests
 ```
 
-## Despliegue 📦
+## Iniciar el servicio 📦
 
 _Agregar las variables de entonor._
 ```
