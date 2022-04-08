@@ -6,7 +6,6 @@ from request_pts import create_simulation_pts, create_client_pts, create_account
 import requests
 import json
 import os
-from example import response_desmbolso, response_aprobacion
 
 app = Flask(__name__)
 

@@ -11,7 +11,7 @@ headerss = {
 
 def creation_time():
     fecha = str(datetime.today()).split(' ')
-    fecha_salida = f'{fecha[0]}T{fecha[1][0:8]}:00-06:00'
+    fecha_salida = f'{fecha[0]}T{fecha[1][0:8]}:00-05:00'
     return fecha_salida
 
 def generate_id():
@@ -117,7 +117,11 @@ def create_account_pts(encodedKey_client,encodedKey_loan,monto, plazo, dia, inte
             "productTypeKey": encodedKey_loan,
             "disbursementDetails": {
                 "firstRepaymentDate": pago,
-                "expectedDisbursementDate": desembolso
+                "expectedDisbursementDate": desembolso,
+                "transactionDetails": {
+                    "transactionChannelKey": "8a44b4917d901148017da066597114fd",
+                    "transactionChannelId": "stp"
+                }
             },
             "scheduleSettings": {
                 "gracePeriod": 0,
@@ -243,7 +247,7 @@ def disbur_account_stp_pts(idCliente,idCuenta, monto):
                 "beneficiaryCustomerAddress": "",
                 "beneficiaryCustomerCity": "",
                 "additionals": {
-                "loanReqId": idCuenta
+                "loanReqId": int(idCuenta)
                 }
             }
             ]
